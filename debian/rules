@@ -5,9 +5,6 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-# Include dpatch stuff.
-include /usr/share/dpatch/dpatch.make
-
 # These are used for cross-compiling and for saving the configure script
 # from having to guess our platform (since we know it already)
 export DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
@@ -19,21 +16,18 @@ else
 	confflags += --build $(DEB_BUILD_GNU_TYPE) --host $(DEB_HOST_GNU_TYPE)
 endif
 
-CFLAGS = -Wall -g
+CFLAGS := `dpkg-buildflags --get CFLAGS`
+CFLAGS += -Wall
+LDFLAGS := `dpkg-buildflags --get LDFLAGS`
+CPPFLAGS := `dpkg-buildflags --get CPPFLAGS`
 
-ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
-	CFLAGS += -O0
-else
-	CFLAGS += -O2
-endif
-
-config.status: patch-stamp configure
+config.status: configure
 	rm -f config.guess config.sub
 	ln -s /usr/share/misc/config.sub /usr/share/misc/config.guess .
 
 	dh_testdir
 	# Configure the package.
-	CFLAGS="$(CFLAGS)" ./configure $(confflags) \
+	CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" ./configure $(confflags) \
 		--prefix=/usr --localstatedir=/var/cache/locate \
 		--enable-d_type-optimisation \
 		--libexecdir='$${prefix}/lib/locate' \
@@ -55,8 +49,7 @@ endif
 endif
 	touch build-stamp
 
-clean: clean1 unpatch
-clean1:
+clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp 
@@ -74,8 +67,6 @@ install: build
 
 	# Add here commands to install the package into debian/findutils.
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
-	install -m755 $(CURDIR)/debian/locate-cron.daily \
-		$(CURDIR)/debian/locate/etc/cron.daily/locate
 	install -m755 $(CURDIR)/debian/tmp/usr/bin/updatedb \
 		$(CURDIR)/debian/locate/usr/bin/updatedb.findutils
 	install -m755 $(CURDIR)/debian/tmp/usr/bin/locate \
@@ -97,8 +88,7 @@ binary-arch: build install
 	dh_installdocs
 	dh_installexamples
 	dh_install
-#	# we have to install the cron script manually, it has the wrong filename
-#	dh_installcron
+	dh_installcron
 	dh_installinfo
 	dh_installman
 	dh_link

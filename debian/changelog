@@ -1,3 +1,28 @@
+findutils (4.4.2-4) unstable; urgency=low
+
+  * Use 3.0 (quilt) format.
+  * 10_Fix29828-testsuite-FreeBSD.patch, pulled from 4.5 series. Fix testsuite
+    deadlock on FreeBSD.
+
+ -- Andreas Metzler <ametzler@debian.org>  Fri, 06 Jan 2012 10:40:28 +0100
+
+findutils (4.4.2-3) unstable; urgency=low
+
+  * Drop all dpatch related stuff.
+
+ -- Andreas Metzler <ametzler@debian.org>  Sat, 31 Dec 2011 17:19:39 +0100
+
+findutils (4.4.2-2) unstable; urgency=low
+
+  * Use dh_installcron to install locate's cron script.
+  * Stop suggesting slocate, it has been removed from the archive.
+    Closes: #565653
+  * Enable hardened build flags through dpkg-buildflags. (Thank's, Moritz
+    Muehlenhoff). Closes: #653849
+  * Drop dpatch build-dependency.
+
+ -- Andreas Metzler <ametzler@debian.org>  Sat, 31 Dec 2011 16:21:15 +0100
+
 findutils (4.4.2-1) unstable; urgency=low
 
   * debian/locate-cron.daily: Test if called by root. (Thank's, Michael Vogt).
@@ -16,6 +41,9 @@ findutils (4.4.1-1) unstable; urgency=low
     + Drops duplicate filesystem proc in PRUNEFS. Closes: #518120
     + Correct code for displaying \0 in find.1. Closes: #476218
     + Updates documentation for find -perm /mode. Closes: #478005
+    + Fixes segfault if  -newerXY test was not followed by any argument.
+      Closes: #496853
+    
   * Standards-Version 3.8.1.
     + Add support for DEB_BUILD_OPTIONS=nocheck.
   * Use filter instead of findstring when checking for
